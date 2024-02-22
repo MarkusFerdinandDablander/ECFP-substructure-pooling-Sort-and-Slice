@@ -1,1 +1,1 @@
-# Improving the vectorial representation of extended-connectivity fingerprints for molecular machine learning: a simple and superior alternative to hash-based folding
+# Improving the Vectorial Representation of Extended-Connectivity Fingerprints for Molecular Machine Learning: A Simple and Superior Alternative to Hash-Based Folding
