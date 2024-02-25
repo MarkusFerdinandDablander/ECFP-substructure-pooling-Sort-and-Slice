@@ -1,0 +1,13 @@
+dataset_name = lit_pcba_esr_ant
+dataset_abbrev = esr
+task_type = classification
+split_type = rand
+split_type_rand_stratified = False
+k_splits = 2
+m_reps = 3
+random_state_cv = 42
+ecfp_settings = {'mol_to_invs_function': <function ecfp_invariants at 0x7f870bab8cb0>, 'radius': 2, 'pool_method': 'hashed', 'dimension': 1024, 'use_bond_invs': True, 'use_chirality': False, 'use_counts': False}
+oversampling = False
+undersampling = False
+ml_model = rf
+rf_settings = {'n_estimators': 100, 'max_depth': None, 'min_samples_leaf': 1, 'min_samples_split': 2, 'bootstrap': True, 'max_features': 'sqrt', 'random_state': 42, 'criterion': 'gini'}

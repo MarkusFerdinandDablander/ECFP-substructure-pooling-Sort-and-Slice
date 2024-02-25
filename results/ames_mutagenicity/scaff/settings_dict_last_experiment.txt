@@ -1,0 +1,11 @@
+dataset_name = ames_mutagenicity
+dataset_abbrev = amut
+task_type = classification
+split_type = scaff
+k_splits = 2
+m_reps = 3
+random_state_cv = 42
+ecfp_settings = {'mol_to_invs_function': <function fcfp_invariants at 0x7fe920f0fb90>, 'radius': 3, 'pool_method': 'sorted', 'dimension': 4096, 'use_bond_invs': True, 'use_chirality': True, 'use_counts': False}
+ml_model = mlp
+rf_settings = {'n_estimators': 100, 'max_depth': None, 'min_samples_leaf': 1, 'min_samples_split': 2, 'bootstrap': True, 'max_features': 'sqrt', 'random_state': 42, 'criterion': 'gini'}
+mlp_settings = {'architecture': [4096, 512, 512, 512, 512, 512, 1], 'hidden_activation': ReLU(), 'use_bias': True, 'hidden_dropout_rate': 0.25, 'hidden_batchnorm': True, 'batch_size': 64, 'dataloader_shuffle': True, 'dataloader_drop_last': True, 'learning_rate': 0.001, 'lr_lambda': <function <lambda> at 0x7fe840173710>, 'lr_last_epoch': 0, 'weight_decay': 0.1, 'num_epochs': 250, 'optimiser': <class 'torch.optim.adamw.AdamW'>, 'print_results_per_epochs': None, 'output_activation': Sigmoid(), 'loss_function': BCELoss(), 'performance_metrics': 'classification'}
