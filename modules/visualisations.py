@@ -18,7 +18,7 @@ def extract_info_from_filename(filename):
     
 
  
-def visualise_ecfp_bar_charts(dataset_name, split_type, metric, title = "", y_unit = ""):
+def visualise_bar_charts(dataset_name, split_type, metric, title = "", y_unit = ""):
     
     # load results
     path = "results/" + dataset_name + "/" + split_type + "/"
@@ -155,11 +155,11 @@ def visualise_ecfp_bar_charts(dataset_name, split_type, metric, title = "", y_un
         ax.set_axisbelow(True)
         
     plt.tight_layout()
-    plt.savefig("bars.svg", bbox_inches = "tight")
+    plt.savefig("figures/bar_charts_" + split_type + ".svg", bbox_inches = "tight")
 
 
     
-def visualise_ecfp_hyperparameter_space_boxplots_one_dataset(dataset_name, metric, show_x_ticks = True, show_legend = True):
+def visualise_box_plots(dataset_name, metric, show_x_ticks = True, show_legend = True):
     
     # initialise figure
     fig, axes = plt.subplots(1, 4, figsize = (10.5, 14.85/5))
@@ -255,7 +255,6 @@ def visualise_ecfp_hyperparameter_space_boxplots_one_dataset(dataset_name, metri
             ax.yaxis.grid(True, linestyle = '-', linewidth = 0.3)
             ax.set_axisbelow(True)
 
-            
             # add legend
             if show_legend == True:
                 if j_1 + j_2 == 0:
@@ -266,5 +265,5 @@ def visualise_ecfp_hyperparameter_space_boxplots_one_dataset(dataset_name, metri
                     ax.legend(handles = [patch1, patch2, patch3, patch4], loc = "upper right", fontsize = 10, ncol = 1, framealpha = 1)
                 
     plt.tight_layout()
-    plt.savefig("boxplots.svg", bbox_inches = "tight")
+    plt.savefig("figures/box_plots.svg", bbox_inches = "tight")
     plt.show()
