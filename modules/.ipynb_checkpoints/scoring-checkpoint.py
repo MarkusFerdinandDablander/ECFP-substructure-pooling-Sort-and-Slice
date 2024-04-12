@@ -1,5 +1,3 @@
-# import packages
-
 import numpy as np
 import pandas as pd
 from scipy.stats import pearsonr
@@ -25,15 +23,30 @@ def transform_probs_to_labels(y_pred_proba_pos, cutoff_value = 0.5):
 
 def binary_classification_scores(y_true, y_pred_proba_pos, display_results = False):
     """
-    For a binary classification task with true labels y_true and predicted probabilities y_pred_proba_pos, this function computes the following metrics: "AUROC", "Accuracy", "Balanced Accuracy", "F1-Score", "MCC", "Sensitivity", "Specificity", "Precision", "Negative Predictive Value", "Test Cases", "Negative Test Cases", "Positive Test Cases".
+    For a binary classification task with true labels y_true and predicted probabilities for the positive class y_pred_proba_pos, this function computes the following metrics:
+    
+    "PRC-AUC",
+    "AUROC", 
+    "Accuracy", 
+    "Balanced Accuracy", 
+    "F1-Score", 
+    "MCC", 
+    "Sensitivity", 
+    "Specificity", 
+    "Precision", 
+    "Negative Predictive Value", 
+    "Test Cases", 
+    "Negative Test Cases", 
+    "Positive Test Cases".
+    
     """
     
     if len(y_true) == 0:
         
         # collect scores
-        scores_array = np.array([float("NaN"), float("NaN"), float("NaN"), float("NaN"), float("NaN"), float("NaN"), float("NaN"), float("NaN"), float("NaN"), 0, 0, 0])
+        scores_array = np.array([float("NaN"), float("NaN"), float("NaN"), float("NaN"), float("NaN"), float("NaN"), float("NaN"), float("NaN"), float("NaN"), float("NaN"), 0, 0, 0])
         scores_array_2d = np.reshape(scores_array, (1, len(scores_array)))
-        columns = ["AUROC", "Accuracy", "Balanced Accuracy", "F1-Score", "MCC", "Sensitivity", "Specificity", "Precision", "Negative Predictive Value", "Test Cases", "Negative Test Cases", "Positive Test Cases"]
+        columns = ["PRC-AUC", "AUROC", "Accuracy", "Balanced Accuracy", "F1-Score", "MCC", "Sensitivity", "Specificity", "Precision", "Negative Predictive Value", "Test Cases", "Negative Test Cases", "Positive Test Cases"]
         scores_df = pd.DataFrame(data = scores_array_2d, index = ["Scores:"], columns = columns)
 
         # display scores
@@ -143,6 +156,20 @@ def binary_classification_scores(y_true, y_pred_proba_pos, display_results = Fal
 
 def regression_scores(y_true, y_pred, display_results = False):
     
+    """
+    For a regression task with true labels y_true and predicted labels y_pred, this function computes the following metrics:
+    
+    "MAE", 
+    "MedAE", 
+    "RMSE", 
+    "MaxAE", 
+    "MSE", 
+    "PearsonCorr", 
+    "R2Coeff", 
+    "Test Cases".
+    
+    """
+    
     if len(y_true) == 0:
         
         # collect scores
@@ -200,8 +227,10 @@ def regression_scores(y_true, y_pred, display_results = False):
         return scores_df
 
 
-    
+
 def summarise_display_and_save_results_and_settings(scores_dict, settings_dict, display_results = True):
+    
+    "Record and save performance results in scores_dict after computational experiment with settings_dict has been run."
     
     columns = list(scores_dict[(0,0)].columns)
     scores_table = pd.DataFrame(columns = columns)

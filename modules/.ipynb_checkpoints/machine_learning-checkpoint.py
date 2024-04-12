@@ -1,4 +1,3 @@
-# import packages
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from imblearn.ensemble import BalancedRandomForestClassifier

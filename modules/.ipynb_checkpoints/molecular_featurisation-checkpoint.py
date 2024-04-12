@@ -1,6 +1,3 @@
-# import packages
-
-# general tools
 import numpy as np
 import pandas as pd
 import random
@@ -8,15 +5,12 @@ from chembl_structure_pipeline.standardizer import standardize_mol, get_parent_m
 from .utils import discretise, remove_random_element
 from .graph_theory import extract_labelled_circular_subgraph_object, check_if_strict_labelled_subgraph
 from .information_theory import *
-
 from rdkit import Chem
 from rdkit.Chem import rdFingerprintGenerator
 from rdkit.Chem.rdMolDescriptors import GetMorganFingerprint
 from rdkit.DataStructs.cDataStructs import UIntSparseIntVect
-
 from sklearn.feature_selection import mutual_info_classif
 from sklearn.preprocessing import KBinsDiscretizer
-
 from scipy.stats import chi2_contingency
 
 
