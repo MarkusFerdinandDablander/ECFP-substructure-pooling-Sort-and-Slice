@@ -1,85 +1,21 @@
 import numpy as np
 import pandas as pd
 import random
-from chembl_structure_pipeline.standardizer import standardize_mol, get_parent_mol
-from .utils import discretise, remove_random_element
 from .graph_theory import extract_labelled_circular_subgraph_object, check_if_strict_labelled_subgraph
-from .information_theory import *
+from .information_theory import mi
 from rdkit import Chem
 from rdkit.Chem import rdFingerprintGenerator
 from rdkit.Chem.rdMolDescriptors import GetMorganFingerprint
 from rdkit.DataStructs.cDataStructs import UIntSparseIntVect
-from sklearn.feature_selection import mutual_info_classif
 from sklearn.preprocessing import KBinsDiscretizer
 from scipy.stats import chi2_contingency
 
 
 
-def smiles_standardisation(x_smiles, get_parent_smiles = True):
-
-    standardised_x_smiles = list(range(len(x_smiles)))
-
-    for (k, smiles) in enumerate(x_smiles):
-
-        try:
-
-            # convert smiles to mol object
-            mol = Chem.MolFromSmiles(smiles)
-
-            # standardise mol object
-            standardised_mol = standardize_mol(mol, check_exclusion = True)
-
-            if get_parent_smiles == True:
-
-                # systematically remove salts, solvents and isotopic information to get parent mol
-                (standardised_mol, exclude) = get_parent_mol(standardised_mol,
-                                                             neutralize = True,
-                                                             check_exclusion=True,
-                                                             verbose = False)
-
-            # convert mol object back to smiles
-            standardised_smiles = Chem.MolToSmiles(standardised_mol)
-
-            # replace smiles with standardised parent smiles
-            standardised_x_smiles[k] = standardised_smiles
-
-        except:
-
-            # leave smiles unchanged if it generates an exception
-            standardised_x_smiles[k] = smiles
-
-    return np.array(standardised_x_smiles)
-
-
-
-def random_invariants(mol):
-    
-    invs = random.sample(range(1, 1000000), mol.GetNumAtoms())
-    
-    return invs
-
-
-
-def uniform_invariants(mol):
-    
-    invs = [1]*mol.GetNumAtoms()
-    
-    return invs
-
-
-
-def atomic_number_invariants(mol):
-    
-    invs = []
-    
-    for atom in mol.GetAtoms():
-        invs.append(atom.GetAtomicNum())
-    
-    return invs
-
-
-
 def ecfp_invariants(mol):
+    """
+    A function that maps an RDKit mol object to a list of hashed integers (one integer for each atom) describing the initial standard ECFP atomic invariants.
+    """
     
     invs = []
     
@@ -94,6 +30,9 @@ def ecfp_invariants(mol):
 
 
 def fcfp_invariants(mol):
+    """
+    A function that maps an RDKit mol object to a list of hashed integers (one integer for each atom) describing the initial pharmacophoric FCFP atomic invariants.
+    """
     
     invs = []
     
@@ -107,39 +46,10 @@ def fcfp_invariants(mol):
 
 
 
-def combined_invariants(invariant_func_1, invariant_func_2):
-    
-    def combined_invariants(mol):
-        
-        invs_1 = invariant_func_1(mol)
-        invs_2 = invariant_func_2(mol)
-        invs = [hash((i_1, i_2)) % 10000001 for (i_1, i_2) in list(zip(invs_1, invs_2))]
-        
-        return invs
-    
-    return combined_invariants
-
-
-
-def ecfp_atom_ids_from_smiles(smiles, ecfp_settings):
-    
-    mol = Chem.MolFromSmiles(smiles)
-    
-    info_dict = {}
-    
-    fp = GetMorganFingerprint(mol,
-                              radius = ecfp_settings["radius"],
-                              useCounts = ecfp_settings["use_counts"],
-                              invariants = ecfp_settings["mol_to_invs_function"](mol), 
-                              useChirality = ecfp_settings["use_chirality"], 
-                              useBondTypes = ecfp_settings["use_bond_invs"], 
-                              bitInfo = info_dict)
-
-    return (UIntSparseIntVect.GetNonzeroElements(fp), info_dict)
-
-
-
 def one_hot_vec(dim, k):
+    """
+    Creates a one-hot vector that has 0s everywhere except in its k-th component.
+    """
     
     vec = np.zeros(dim)
     vec[k] = 1
@@ -148,30 +58,68 @@ def one_hot_vec(dim, k):
 
 
 
+def ecfp_atom_ids_from_smiles(smiles, ecfp_settings):
+    """
+    A function that takes as input a SMILES string and a dictionary of ECFP settings and outputs a pair of dictionaries. The keys of each dictionary are given by the hashed integer ECFP substructure identifiers detected in the input molecule. The first dictionary maps each substructure identifier to its count (i.e. how often it appears in the input compound). If ecfp_settings["use_counts"] = False, then all substructure identifiers are mapped to 1. The second dictionary named info_dict maps each substructure identifier to a tuple containing its location(s) in the input compound (specified via the center atom and the radius).
+    
+    """
+    
+    mol = Chem.MolFromSmiles(smiles)
+    
+    info_dict = {}
+    
+    fp = GetMorganFingerprint(mol,
+                              radius = ecfp_settings["radius"], # 0 or 1 or 2 or ...
+                              useCounts = ecfp_settings["use_counts"], # True or False
+                              invariants = ecfp_settings["mol_to_invs_function"](mol), # ecfp_invariants(mol) or fcfp_invariants(mol) 
+                              useChirality = ecfp_settings["use_chirality"], # True or False
+                              useBondTypes = ecfp_settings["use_bond_invs"], # True or False
+                              bitInfo = info_dict)
+
+    return (UIntSparseIntVect.GetNonzeroElements(fp), info_dict)
+
+
+
+
+
+
+
+
+
+
+
+
 def create_ecfp_atom_id_one_hot_encoder_frequency(x_smiles, ecfp_settings):
+    """
+    Takes as input a list of smiles strings x_smiles = [smiles_1, smiles_2, ...] and a dictionary of ECFP settings and gives as output a function atom_id_one_hot_encoder that maps integer substructure identifiers to one-hot encoded vector representations. The components of the vector representation are sorted by frequency, whereby the substructure identifiers that appear in the most compounds in x_smiles appear first. The dimension of the vector representation is determined by ecfp_settings["dimension"]. If ecfp_settings["dimension"] is larger than the number of unique substructure identifiers in all compounds in x_smiles, then the vector representation is padded with 0s to reach the desired length.
+    """
     
      # preallocate data structures
     atom_id_set = set()
-    atom_id_to_support_list_with_counts = {}
+    atom_id_to_support_list_with_counts = {} # the support_list_with_counts for a given atom_id is a list of len(x_smiles) whose i-th entry specifies how often the given atom_id occurs in smiles_i
     
     # create set of all occuring atom ids and associated feature matrix with support columns
     for (k, smiles) in enumerate(x_smiles):
         
-        (current_atom_id_to_count, current_info) = ecfp_atom_ids_from_smiles(smiles, ecfp_settings)
+        current_atom_id_to_count = ecfp_atom_ids_from_smiles(smiles, ecfp_settings)[0]
         atom_id_set = atom_id_set.union(set(current_atom_id_to_count))
         
         for atom_id in set(current_atom_id_to_count):
-            atom_id_to_support_list_with_counts[atom_id] = atom_id_to_support_list_with_counts.get(atom_id, [0]*len(x_smiles))
+            atom_id_to_support_list_with_counts[atom_id] = atom_id_to_support_list_with_counts.get(atom_id, [0]*len(x_smiles)) # if the given atom_id is not yet in the dictionary, initialise it along with a value consisting of a list of 0s
             atom_id_to_support_list_with_counts[atom_id][k] = current_atom_id_to_count[atom_id]
     
-    # binarise support list so that it only indicates presence/absence of fragments in training compounds
+    print("Number of unique substructures in molecular data set = ", len(atom_id_set))
+    
+    # binarise support list so that it only indicates presence/absence of fragments in training compounds (without counts)
     atom_id_to_support_list = {atom_id: [1 if b > 0 else 0 for b in support_list_with_counts] for (atom_id, support_list_with_counts) in atom_id_to_support_list_with_counts.items()}
     
-    print("Number of unique substructures = ", len(atom_id_set))
-    
+    # create dictionary that maps each atom_id to an integer specifying in how many compounds in x_smiles it appears
     atom_id_to_support_cardinality = {atom_id: sum(support_list) for (atom_id, support_list) in atom_id_to_support_list.items()}
+    
+    # sort atom_ids based on their frequency of appearance in x_smiles, i.e. atom_ids that appear in the most compounds in x_smiles appear first
     atom_id_list_sorted = sorted(list(atom_id_set), key = lambda atom_id: atom_id_to_support_cardinality[atom_id], reverse = True)
     
+    # trim atom_id_list based on desired fingerprint dimension
     final_atom_id_list = atom_id_list_sorted[0: ecfp_settings["dimension"]]
 
     zero_padding_dim = int(-min(len(final_atom_id_list) - ecfp_settings["dimension"], 0)) + 1
@@ -187,6 +135,21 @@ def create_ecfp_atom_id_one_hot_encoder_frequency(x_smiles, ecfp_settings):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def chi_squared_p_value(x_discrete, y_discrete):
     
     df = pd.DataFrame(data = {"x_discrete": x_discrete, "y_discrete": y_discrete})
@@ -194,6 +157,18 @@ def chi_squared_p_value(x_discrete, y_discrete):
     (chi_squared, p_value, degrees_of_freedom, expected_frequencies) = chi2_contingency(contingency_table)
 
     return p_value
+
+
+
+
+
+
+def discretise(y_cont, n_bins = 2, strategy = "uniform"):
+    
+    discretiser = KBinsDiscretizer(n_bins = n_bins, encode = "ordinal", strategy = strategy)
+    y_disc = list(discretiser.fit_transform(np.array(y_cont).reshape(-1,1)).reshape(-1).astype(int))
+    
+    return y_disc
 
 
 
@@ -293,6 +268,20 @@ def create_ecfp_atom_id_one_hot_encoder_chi_squared(x_smiles, y, ecfp_settings, 
 
 
 
+
+
+
+def remove_random_element(my_list, random_state = 42):
+    
+    random.seed(random_state)
+    my_list.pop(random.randrange(len(my_list)))
+    
+    return my_list
+
+
+
+
+
 def create_ecfp_atom_id_one_hot_encoder_mim(x_smiles, y, ecfp_settings, discretise_y, base = 2, random_state = 42):
     
     # set random seed
@@ -360,54 +349,6 @@ def create_ecfp_atom_id_one_hot_encoder_mim(x_smiles, y, ecfp_settings, discreti
     return atom_id_one_hot_encoder
 
 
-
-def create_ecfp_atom_id_one_hot_encoder_cmim(x_smiles, y, ecfp_settings, discretise_y, entropy_keep_upper = 8192, base = 2):
-    
-     # preallocate data structures
-    atom_id_set = set()
-    atom_id_to_support_list_with_counts = {}
-    
-    # create set of all occuring atom ids and associated feature matrix with support columns
-    for (k, smiles) in enumerate(x_smiles):
-        
-        (current_atom_id_to_count, current_info) = ecfp_atom_ids_from_smiles(smiles, ecfp_settings)
-        atom_id_set = atom_id_set.union(set(current_atom_id_to_count))
-        
-        for atom_id in set(current_atom_id_to_count):
-            atom_id_to_support_list_with_counts[atom_id] = atom_id_to_support_list_with_counts.get(atom_id, [0]*len(x_smiles))
-            atom_id_to_support_list_with_counts[atom_id][k] = current_atom_id_to_count[atom_id]
-    
-    # binarise support list so that it only indicates presence/absence of fragments in training compounds
-    atom_id_to_support_list = {atom_id: [1 if b > 0 else 0 for b in support_list_with_counts] for (atom_id, support_list_with_counts) in atom_id_to_support_list_with_counts.items()}
-    
-    print("Number of unique substructures = ", len(atom_id_set))
-    
-    # step 1: sort fragments by entropy and then only keep entropy_keep_upper 
-    atom_ids_sorted_by_entropy = sorted(list(atom_id_set), key = lambda atom_id: entropy(atom_id_to_support_list[atom_id], base = base), reverse = False)
-    
-    while len(atom_id_set) > max(ecfp_settings["dimension"], entropy_keep_upper):
-        
-        atom_id_set.remove(atom_ids_sorted_by_entropy[0])
-        atom_id_to_support_list.pop(atom_ids_sorted_by_entropy[0])
-        atom_id_to_support_list_with_counts.pop(atom_ids_sorted_by_entropy[0])
-        atom_ids_sorted_by_entropy.remove(atom_ids_sorted_by_entropy[0])
-
-    # step 2: select fragments via conditional mutual information maximisation
-    if discretise_y == True:
-        y = discretise(y, n_bins = 2, strategy = "quantile")
-
-    final_atom_id_list = fast_feature_selection_via_cmi_maximisation(atom_id_to_support_list, y, ecfp_settings["dimension"], base = base)
-
-    zero_padding_dim = int(-min(len(final_atom_id_list) - ecfp_settings["dimension"], 0)) + 1
-    final_atom_id_list_to_one_hot_vecs = dict([(atom_id, one_hot_vec(len(final_atom_id_list) + zero_padding_dim, k)) for (k, atom_id) in enumerate(final_atom_id_list)])
-    
-    def atom_id_one_hot_encoder(atom_id):
-        
-        other_vec = one_hot_vec(len(final_atom_id_list) + zero_padding_dim, len(final_atom_id_list) + zero_padding_dim - 1)
-        
-        return final_atom_id_list_to_one_hot_vecs.get(atom_id, other_vec)
-    
-    return atom_id_one_hot_encoder
 
 
 

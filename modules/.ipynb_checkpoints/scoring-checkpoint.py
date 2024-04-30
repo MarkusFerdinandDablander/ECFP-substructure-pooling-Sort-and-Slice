@@ -3,6 +3,9 @@ import pandas as pd
 from scipy.stats import pearsonr
 from sklearn.metrics import roc_auc_score, f1_score, matthews_corrcoef, confusion_matrix, mean_absolute_error, mean_squared_error, median_absolute_error, max_error, r2_score, average_precision_score
 from .molecular_featurisation import ecfp_invariants, fcfp_invariants
+import os
+import glob
+
 
 
 
@@ -261,3 +264,10 @@ def summarise_display_and_save_results_and_settings(scores_dict, settings_dict, 
     with open(filepath + "settings_dict_last_experiment.txt", 'w') as f:
         for key in settings_dict.keys():
             f.write(str(key) + " = " + str(settings_dict[key]) + "\n")
+            
+
+
+def delete_all_files_in_folder(filepath):
+    files = glob.glob(filepath + "*")
+    for f in files:
+        os.remove(f)

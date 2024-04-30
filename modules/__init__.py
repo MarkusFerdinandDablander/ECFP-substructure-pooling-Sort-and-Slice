@@ -6,4 +6,3 @@ from .scoring import *
 from .graph_theory import *
 from .information_theory import *
 from .visualisations import *
-from .utils import *
