@@ -10,13 +10,6 @@ from sklearn.model_selection import KFold, StratifiedKFold
 
 
 
-def delete_all_files_in_folder(filepath):
-    files = glob.glob(filepath + "*")
-    for f in files:
-        os.remove(f)
-
-
-
 def create_data_split_dict_random(x_smiles,
                                   k_splits,
                                   m_reps,

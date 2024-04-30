@@ -2,18 +2,7 @@ import numpy as np
 import random
 import os
 import glob
-from rdkit.Chem import Draw
 from sklearn.preprocessing import KBinsDiscretizer
-
-
-def display_mol_with_atom_indices(mol):
-        
-    for atom in mol.GetAtoms():
-        atom.SetProp("atomLabel", str(atom.GetIdx()))
-
-    image = Draw.MolToImage(mol)
-
-    return image
 
 
 

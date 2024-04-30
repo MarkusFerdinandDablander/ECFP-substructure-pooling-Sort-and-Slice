@@ -2,6 +2,7 @@ import graph_tool as gt
 from graph_tool.topology import subgraph_isomorphism
 
 
+
 def extract_circular_subgraph_vertices_and_edges(mol, center_atom_index, radius):
     
     V = {center_atom_index}
@@ -98,10 +99,12 @@ def check_if_strict_labelled_subgraph(G_sub_with_labels, G_with_labels):
     (G_sub, G_sub_vertex_labels, G_sub_edge_labels) = G_sub_with_labels
     (G, G_vertex_labels, G_edge_labels) = G_with_labels
     
+    # if potential subgraph has more or equal amount of nodes than graph, then it cannot be a strict subgraph
     if G_sub.num_vertices() >= G.num_vertices():
         
         return False
     
+    # check if strict subgraph (also considering labels)
     else:
     
         list_of_vertex_maps = subgraph_isomorphism(G_sub, 
