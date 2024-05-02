@@ -257,7 +257,7 @@ def summarise_display_and_save_results_and_settings(scores_dict, settings_dict, 
     elif settings_dict["ecfp_settings"]["mol_to_invs_function"] == fcfp_invariants:
         feature_info = str(settings_dict["ecfp_settings"]["dimension"]) + "fcfp" + str(2*settings_dict["ecfp_settings"]["radius"]) + settings_dict["ecfp_settings"]["pool_method"]
     
-    filename = settings_dict["dataset_abbrev"] + "_" + settings_dict["split_type"] + "k" + str(settings_dict["k_splits"]) + "m" + str(settings_dict["m_reps"]) + "_" + feature_info + "_" + settings_dict["ml_model"]
+    filename = settings_dict["dataset_name"] + "_" + settings_dict["split_type"] + "k" + str(settings_dict["k_splits"]) + "m" + str(settings_dict["m_reps"]) + "_" + feature_info + "_" + settings_dict["ml_model"]
     filepath = "results/" + settings_dict["dataset_name"] + "/" + settings_dict["split_type"] + "/"
     scores_table.to_csv(filepath + filename + ".csv")
     
