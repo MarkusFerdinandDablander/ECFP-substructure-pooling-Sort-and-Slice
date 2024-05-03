@@ -83,7 +83,7 @@ def ecfp_atom_ids_from_smiles(smiles, ecfp_settings):
 
 def create_ecfp_atom_id_one_hot_encoder_sort_and_slice(x_smiles, ecfp_settings):
     """
-    Takes as input a list of SMILES strings x_smiles = [smiles_1, smiles_2, ...] and a dictionary of ECFP settings and gives as output a function atom_id_one_hot_encoder that maps integer substructure identifiers (= atom ids) to one-hot encoded vector representations of dimension ecfp_settings["dimension"]. The components of the vector representation are sorted by frequency, whereby the substructure identifiers that appear in the most compounds in x_smiles appear first. Substructure identifiers that are not part of the most frequent ecfp_settings["dimension"] substructures (or not in x_smiles at all) are all mapped to a vector of 0s. If ecfp_settings["dimension"] is larger than the number of unique substructure identifiers in all compounds in x_smiles, then the vector representation is padded with 0s to reach the desired length.
+    Takes as input a list of SMILES strings x_smiles = [smiles_1, smiles_2, ...] and a dictionary of ECFP settings and gives as output a function atom_id_one_hot_encoder that maps integer substructure identifiers (= atom ids) to one-hot encoded vector representations of dimension ecfp_settings["dimension"]. The components of the vector representation are sorted by prevalence, whereby the substructure identifiers that appear in the most compounds in x_smiles appear first. Substructure identifiers that are not part of the most frequent ecfp_settings["dimension"] substructures (or not in x_smiles at all) are all mapped to a vector of 0s. If ecfp_settings["dimension"] is larger than the number of unique substructure identifiers in all compounds in x_smiles, then the vector representation is padded with 0s to reach the desired length.
     """
     
      # preallocate data structures
@@ -97,8 +97,9 @@ def create_ecfp_atom_id_one_hot_encoder_sort_and_slice(x_smiles, ecfp_settings):
         for atom_id in current_atom_id_to_count.keys():
             atom_id_to_support_list[atom_id][k] = 1 if current_atom_id_to_count[atom_id] > 0 else 0
   
-    # sort atom ids based on their frequency in x_smiles, i.e. atom_ids that appear in the more compounds in x_smiles appear first
-    atom_id_list_sorted = list(dict(sorted(atom_id_to_support_list.items(), key = lambda item: (sum(item[1]), -item[0]), reverse = True)).keys()) # break ties by using the (arbitrary) order defined by the integer atom ids themselves (via -item[0])
+    # sort atom ids based on their prevalence in x_smiles, i.e. atom_ids that appear in the more compounds in x_smiles appear first
+    # break ties by using the (arbitrary) order defined by the integer atom ids themselves (via -item[0])
+    atom_id_list_sorted = list(dict(sorted(atom_id_to_support_list.items(), key = lambda item: (sum(item[1]), -item[0]), reverse = True)).keys())
     
     # create integer substructure identifier (= atom id) embedding function
     def atom_id_one_hot_encoder(atom_id):
@@ -136,7 +137,7 @@ def chi_squared_p_value(x_discrete, y_discrete):
 
 
 
-def create_ecfp_atom_id_one_hot_encoder_chi_filtered(x_smiles, y, ecfp_settings, discretise_y, random_state = 42):
+def create_ecfp_atom_id_one_hot_encoder_filtered(x_smiles, y, ecfp_settings, discretise_y, random_state = 42):
     """
     Takes as input a list of smiles strings x_smiles = [smiles_1, smiles_2, ...], a list of target values y, and a dictionary of ECFP settings and gives as output a function atom_id_one_hot_encoder that maps integer substructure identifiers (= atom ids) to one-hot encoded vector representations of dimension ecfp_settings["dimension"] based on a substructure selection according to filtered fingerprints (this implementation is inspired by the article of Gütlein and Kramer, 2016, "Filtered circular fingerprints improve either prediction or runtime performance while retaining interpretability"). If y is continuous, it needs to be discretised to compute the Chi-Squared p-values. Substructure identifiers that do not occur in the selection are all mapped to a vector of 0s. If ecfp_settings["dimension"] is larger than the number of unique substructure identifiers in all compounds in x_smiles, then the vector representation is padded with 0s to reach the desired length.
     """
@@ -315,8 +316,7 @@ def create_ecfp_featuriser(ecfp_settings,
                            random_state = 42):
     
     """
-    Create a featurisation function "featuriser" that takes as input a list of SMILES strings x_smiles and gives as output a numpy array whose rows are vectorial ECFP representations for the input compounds. The option ecfp_settings["pool_method"]
-    determines which substructure pooling method the output featuriser is equipped with.
+    Create a featurisation function "featuriser" that takes as input a list of SMILES strings x_smiles and gives as output a numpy array whose rows are vectorial ECFP representations for the input compounds. The option ecfp_settings["pool_method"] determines which substructure pooling method the output featuriser is equipped with.
     """
     
     if ecfp_settings["pool_method"] == "hashed":
@@ -340,7 +340,7 @@ def create_ecfp_featuriser(ecfp_settings,
         if ecfp_settings["pool_method"] == "sort_and_slice":
             atom_id_one_hot_encoder = create_ecfp_atom_id_one_hot_encoder_sort_and_slice(x_smiles_train, ecfp_settings)
         elif ecfp_settings["pool_method"] == "filtered":
-            atom_id_one_hot_encoder = create_ecfp_atom_id_one_hot_encoder_chi_filtered(x_smiles_train, y_train, ecfp_settings, discretise_y, random_state)
+            atom_id_one_hot_encoder = create_ecfp_atom_id_one_hot_encoder_filtered(x_smiles_train, y_train, ecfp_settings, discretise_y, random_state)
         elif ecfp_settings["pool_method"] == "mim":
             atom_id_one_hot_encoder = create_ecfp_atom_id_one_hot_encoder_mim(x_smiles_train, y_train, ecfp_settings, discretise_y, base, random_state)
         
@@ -390,7 +390,7 @@ def create_ecfp_atom_id_one_hot_encoder_sort_and_slice_old(x_smiles, ecfp_settin
     # binarise support list so that it only indicates presence/absence of fragments in training compounds
     atom_id_to_support_list = {atom_id: [1 if b > 0 else 0 for b in support_list_with_counts] for (atom_id, support_list_with_counts) in atom_id_to_support_list_with_counts.items()}
     
-    # create atom id list sorted by frequency
+    # create atom id list sorted by prevalence
     atom_id_to_support_cardinality = {atom_id: sum(support_list) for (atom_id, support_list) in atom_id_to_support_list.items()}
     atom_id_list_sorted = sorted(list(atom_id_set), key = lambda atom_id: atom_id_to_support_cardinality[atom_id], reverse = True)
    

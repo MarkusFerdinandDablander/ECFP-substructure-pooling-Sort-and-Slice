@@ -72,7 +72,7 @@ def visualise_bar_charts(dataset_name, split_type, metric, y_unit = ""):
                     
                     x_tick_labels.append(invs.upper() + str(diam))
                     
-                    for pool in ["hashed", "chi2", "mim", "sorted"]:
+                    for pool in ["hashed", "filtered", "mim", "sort_and_slice"]:
                         
                         means.append(results_dict[(dim, invs, diam, pool, ml)][0])
                         stds.append(results_dict[(dim, invs, diam, pool, ml)][1])
