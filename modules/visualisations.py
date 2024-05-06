@@ -7,23 +7,22 @@ import matplotlib.pyplot as plt
 
 
 
+
+
 def extract_info_from_filename(filename):
     
     """
     Uses filename to extract information of the form 
     (fingerprint_dimension, used_invariants, fingerprint_diameter, used_pooling_method, used_ml_method)
     """
+
+    (dim, invs, diam, pool, ml) = re.findall(r"(512|1024|2048|4096)(ecfp|fcfp)(2|4|6)(hashed|filtered|mim|sort_and_slice)_(rf|mlp)", filename)[0]
     
-    (fp_info, ml_info) = filename.split("_")[2:4]
-    ml_info = ml_info.split(".")[0]
-
-    match = re.match(r"([0-9]+)([a-z]+)([0-9]+)([a-z0-9]+)", fp_info, re.I)
-
-    return (int(match.groups()[0]), str(match.groups()[1]), int(match.groups()[2]), str(match.groups()[3]), str(ml_info))
+    return (int(dim), invs, int(diam), pool, ml)
 
 
 
-def visualise_bar_charts(dataset_name, split_type, metric, y_unit = ""):
+def visualise_bar_charts(dataset_name, split_type, metric, y_lims = None, y_unit = ""):
     
     # load results
     path = "results/" + dataset_name + "/" + split_type + "/"
@@ -55,8 +54,12 @@ def visualise_bar_charts(dataset_name, split_type, metric, y_unit = ""):
     fig.suptitle(dataset_name_dict[dataset_name], fontsize = 14, x = 0.52, y = 1.005, fontweight = "bold")
     
     # compute limits for y-axis
-    y_max = max([v[0] for v in results_dict.values()])
-    y_min = min([v[0] for v in results_dict.values()])
+    if y_lims == None:
+        y_min = min([v[0] for v in results_dict.values()])
+        y_max = max([v[0] for v in results_dict.values()])
+    else:
+        y_min = y_lims[0]
+        y_max = y_lims[1]
     
     for (i, ml) in enumerate(["rf", "mlp"]):
         
@@ -214,7 +217,7 @@ def visualise_box_plots(dataset_name, metric, y_unit = "", show_x_ticks = True, 
 
     for split_type in ["rand", "scaff"]:
         for ml in ["rf", "mlp"]:
-            for pool in ["hashed", "chi2", "mim", "sorted"]:
+            for pool in ["hashed", "filtered", "mim", "sort_and_slice"]:
                 boxplot_data_dict[(pool, ml, split_type)] = [mean for (key, mean) in results_dict.items() if key[3:] == (pool, ml, split_type)]
 
     # assign axis object
@@ -224,7 +227,13 @@ def visualise_box_plots(dataset_name, metric, y_unit = "", show_x_ticks = True, 
             ax = axes[2*j_1 + j_2]
 
             # create boxplot
-            data = [boxplot_data_dict[(pool, ml, split_type)] for pool in ["hashed", "chi2", "mim", "sorted"]]
+            data = [boxplot_data_dict[(pool, ml, split_type)] for pool in ["hashed", "filtered", "mim", "sort_and_slice"]]
+            
+            import numpy as np
+            print(np.mean(np.array(data), axis = 1))
+            print(np.std(np.array(data), axis = 1), "\n")
+            
+            
             colours = ["silver", "violet", "lightsalmon", "forestgreen"]*4
             sns.boxplot(data = data, orient = "v", fliersize = 4, palette = colours, width = 0.7, linewidth = 2, ax = ax)
 
