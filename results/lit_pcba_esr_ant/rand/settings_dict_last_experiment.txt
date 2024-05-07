@@ -6,6 +6,6 @@ split_type_rand_stratified = True
 k_splits = 2
 m_reps = 2
 random_state_cv = 42
-ecfp_settings = {'mol_to_invs_function': <function ecfp_invariants at 0x7f0b6b8feb00>, 'radius': 2, 'pool_method': 'filtered', 'dimension': 512, 'use_bond_invs': True, 'use_chirality': True, 'use_counts': False}
+ecfp_settings = {'mol_to_invs_function': <function ecfp_invariants at 0x7f18c7cb9b00>, 'radius': 2, 'pool_method': 'filtered', 'dimension': 512, 'use_bond_invs': True, 'use_chirality': True, 'use_counts': False}
 ml_model = rf
 rf_settings = {'n_estimators': 1, 'max_depth': None, 'min_samples_leaf': 1, 'min_samples_split': 2, 'bootstrap': True, 'max_features': 'sqrt', 'random_state': 42, 'criterion': 'gini'}

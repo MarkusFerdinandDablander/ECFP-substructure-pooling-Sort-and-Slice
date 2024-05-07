@@ -105,6 +105,8 @@ def create_ecfp_atom_id_one_hot_encoder_sort_and_slice(x_smiles, ecfp_settings, 
         for atom_id in current_atom_id_to_count.keys():
             atom_id_to_support_list[atom_id][k] = 1 if current_atom_id_to_count[atom_id] > 0 else 0
             
+    print("Number of unique circular substructures with specified parameters in molecular data set = ", len(atom_id_to_support_list.keys()))
+    
     # create list of atom ids sorted by prevalence in x_smiles (ties are either broken using the arbitrary ordering induced via sorted(list(...), ...) or the arbitrary ordering induced by the integer atom ids themselves)
     if break_ties_with == "sorted_list_command":
         atom_id_list_sorted = sorted(list(atom_id_set), key = lambda atom_id: sum(atom_id_to_support_list[atom_id]), reverse = True)
@@ -115,8 +117,6 @@ def create_ecfp_atom_id_one_hot_encoder_sort_and_slice(x_smiles, ecfp_settings, 
     def atom_id_one_hot_encoder(atom_id):
         
         return one_hot_vec(ecfp_settings["dimension"], atom_id_list_sorted.index(atom_id)) if atom_id in atom_id_list_sorted[0: ecfp_settings["dimension"]] else np.zeros(ecfp_settings["dimension"])
-    
-    print("Number of unique substructures in molecular data set = ", len(atom_id_to_support_list.keys()))
     
     return atom_id_one_hot_encoder
 
@@ -148,13 +148,20 @@ def chi_squared_p_value(x_discrete, y_discrete):
 
 
 def create_ecfp_atom_id_one_hot_encoder_filtered(x_smiles, y, ecfp_settings, discretise_y, random_state = 42):
+    """
+    Takes as input a list of smiles strings x_smiles = [smiles_1, smiles_2, ...], a list of target values y, and a dictionary of ECFP settings and gives as output a function atom_id_one_hot_encoder that maps integer substructure identifiers (= atom ids) to 
+    one-hot encoded vector representations of dimension ecfp_settings["dimension"] based on a substructure selection according to filtered fingerprints. 
+    This implementation is inspired by the article of Gütlein and Kramer, 2016, "Filtered circular fingerprints improve either prediction or runtime performance while retaining interpretability". 
+    If y is continuous, it needs to be discretised to compute the Chi-Squared p-values. Substructure identifiers that do not occur in the selection are all mapped to a vector of 0s. 
+    If ecfp_settings["dimension"] is larger than the number of unique substructure identifiers in all compounds in x_smiles, then the vector representation is padded with 0s to reach the desired length.
+    """
     
     # set random seed
     random.seed(random_state)
     
     # preallocate data structures
     atom_id_set = set()
-    atom_id_to_support_list_with_counts = {}
+    atom_id_to_support_list = defaultdict(lambda: [0]*len(x_smiles)) # the support_list for a given atom_id is a binary list of len(x_smiles) whose i-th entry specifies whether the atom_id is contained in smiles_i
     atom_id_to_info_list = {}
     
     # create set of all occuring atom ids and associated feature matrix with support columns
@@ -163,33 +170,31 @@ def create_ecfp_atom_id_one_hot_encoder_filtered(x_smiles, y, ecfp_settings, dis
         (current_atom_id_to_count, current_info) = ecfp_atom_ids_from_smiles(smiles, ecfp_settings)
         atom_id_set = atom_id_set.union(set(current_atom_id_to_count))
         
-        for atom_id in set(current_atom_id_to_count):
-            atom_id_to_support_list_with_counts[atom_id] = atom_id_to_support_list_with_counts.get(atom_id, [0]*len(x_smiles))
-            atom_id_to_support_list_with_counts[atom_id][k] = current_atom_id_to_count[atom_id]
+        for atom_id in current_atom_id_to_count.keys():
+            atom_id_to_support_list[atom_id][k] = 1 if current_atom_id_to_count[atom_id] > 0 else 0
             atom_id_to_info_list[atom_id] = atom_id_to_info_list.get(atom_id, []) + [(smiles, current_info[atom_id])]
     
-    # binarise support list so that it only indicates presence/absence of fragments in training compounds
-    atom_id_to_support_list = {atom_id: [1 if b > 0 else 0 for b in support_list_with_counts] for (atom_id, support_list_with_counts) in atom_id_to_support_list_with_counts.items()}
-    
-    print("Number of unique substructures = ", len(atom_id_set))
+    print("Number of unique circular substructures with specified parameters in molecular data set = ", len(atom_id_set))
     
     # step 1: remove fragments with support of cardinality = 1, i.e. fragments which only occur in a single training compound
-    atom_ids_single_occ = [atom_id for atom_id in atom_id_set if sum(atom_id_to_support_list[atom_id]) == 1]
+    atom_ids_single_occ = [atom_id for (atom_id, support_list) in atom_id_to_support_list.items() if sum(support_list) == 1]
     random.shuffle(atom_ids_single_occ)
 
     while len(atom_ids_single_occ) > 0 and len(atom_id_set) > ecfp_settings["dimension"]:
         
         atom_id_set.remove(atom_ids_single_occ[0])
         atom_id_to_support_list.pop(atom_ids_single_occ[0])
-        atom_id_to_support_list_with_counts.pop(atom_ids_single_occ[0])
         atom_ids_single_occ.remove(atom_ids_single_occ[0])
-    
+
     # step 2: remove non-closed fragments, i.e. fragments for which a subfragment (an labelled subgraph) exists which occurs in the exact same set of training compounds (= which has the same support)
     support_tuple_to_atom_id_list = {}
     for (atom_id, support_list) in atom_id_to_support_list.items():
         support_tuple_to_atom_id_list[tuple(support_list)] = support_tuple_to_atom_id_list.get(tuple(support_list), []) + [atom_id]
     
+    # list of lists of substructure identifiers (= atom ids) that have the same support (and at least length 2)
     atom_id_lists_grouped_by_support = [atom_id_list for atom_id_list in support_tuple_to_atom_id_list.values() if len(atom_id_list) >= 2]
+    
+    # create a dictionary that maps atom ids to molecular graph objects (assumes a unique mapping from atom ids to graph objects, which is true up to rare hash collisions intrinsic to the ECFP algorithm during the generation of the atom ids)
     atom_id_to_graph_object = {}
     
     for atom_id_list in atom_id_lists_grouped_by_support:
@@ -198,7 +203,8 @@ def create_ecfp_atom_id_one_hot_encoder_filtered(x_smiles, y, ecfp_settings, dis
             (smiles, positions) = random.choice(atom_id_to_info_list[atom_id])
             (center_atom_index, radius) = random.choice(positions)
             atom_id_to_graph_object[atom_id] = extract_labelled_circular_subgraph_object(Chem.MolFromSmiles(smiles), center_atom_index, radius, ecfp_settings)
-            
+    
+    # create list of non-closed fragments
     atom_ids_non_closed = []
     
     for atom_id_list in atom_id_lists_grouped_by_support:
@@ -212,31 +218,27 @@ def create_ecfp_atom_id_one_hot_encoder_filtered(x_smiles, y, ecfp_settings, dis
         
         atom_id_set.remove(atom_ids_non_closed[0])
         atom_id_to_support_list.pop(atom_ids_non_closed[0])
-        atom_id_to_support_list_with_counts.pop(atom_ids_non_closed[0])
         atom_ids_non_closed.remove(atom_ids_non_closed[0])
-    
-    # step 3: rank fragments via Chi-square test and make cutoff
+ 
+    # step 3: rank fragments via Chi-square test and remove fragments whose p-value is too high
     if discretise_y == True:
         y = discretise(y, n_bins = 2, strategy = "quantile")
     
-    atom_id_list_chi_squared_sorted = sorted(list(atom_id_set), key = lambda atom_id: chi_squared_p_value(atom_id_to_support_list[atom_id], y)) # replace with atom_id_to_support_list_with_counts to include count-information (if switched on in ecfp_settings) when computing the p-values
+    atom_id_list_sorted = sorted(list(atom_id_set), key = lambda atom_id: chi_squared_p_value(atom_id_to_support_list[atom_id], y))
     
     while len(atom_id_set) > ecfp_settings["dimension"]:
         
-        atom_id_set.remove(atom_id_list_chi_squared_sorted[-1])
-        atom_id_to_support_list.pop(atom_id_list_chi_squared_sorted[-1])
-        atom_id_to_support_list_with_counts.pop(atom_id_list_chi_squared_sorted[-1])
-        atom_id_list_chi_squared_sorted.remove(atom_id_list_chi_squared_sorted[-1])
+        atom_id_set.remove(atom_id_list_sorted[-1])
+        atom_id_list_sorted.remove(atom_id_list_sorted[-1])
 
     final_atom_id_list = list(atom_id_set)
     
     # create integer substructure identifier (= atom id) embedding function
     def atom_id_one_hot_encoder(atom_id):
         
-        return one_hot_vec(ecfp_settings["dimension"], final_atom_id_list.index(atom_id)) if atom_id in final_atom_id_list[0: ecfp_settings["dimension"]] else np.zeros(ecfp_settings["dimension"])
+        return one_hot_vec(ecfp_settings["dimension"], final_atom_id_list.index(atom_id)) if atom_id in final_atom_id_list else np.zeros(ecfp_settings["dimension"])
     
     return atom_id_one_hot_encoder
-
 
 
 
@@ -249,6 +251,7 @@ def remove_random_element(my_list, random_state = 42):
     my_list.pop(random.randrange(len(my_list)))
     
     return my_list
+
 
 
 def create_ecfp_atom_id_one_hot_encoder_mim(x_smiles, y, ecfp_settings, discretise_y, base = 2, random_state = 42):
@@ -310,9 +313,6 @@ def create_ecfp_atom_id_one_hot_encoder_mim(x_smiles, y, ecfp_settings, discreti
         return one_hot_vec(ecfp_settings["dimension"], atom_id_list_sorted.index(atom_id)) if atom_id in atom_id_list_sorted[0: ecfp_settings["dimension"]] else np.zeros(ecfp_settings["dimension"])
     
     return atom_id_one_hot_encoder
-
-
-    
 
 
 
@@ -382,52 +382,3 @@ def create_ecfp_featuriser(ecfp_settings,
             return X_fp
         
         return featuriser
-
-
-
-
-
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-"""
-def create_ecfp_atom_id_one_hot_encoder_sort_and_slice_old(x_smiles, ecfp_settings):
-    
-     # preallocate data structures
-    atom_id_set = set()
-    atom_id_to_support_list_with_counts = {}
-    
-    # create set of all occuring integer substructure identifiers (= atom ids) and associated feature matrix with support columns
-    for (k, smiles) in enumerate(x_smiles):
-        
-        (current_atom_id_to_count, current_info) = ecfp_atom_ids_from_smiles(smiles, ecfp_settings)
-        atom_id_set = atom_id_set.union(set(current_atom_id_to_count))
-        
-        for atom_id in set(current_atom_id_to_count):
-            atom_id_to_support_list_with_counts[atom_id] = atom_id_to_support_list_with_counts.get(atom_id, [0]*len(x_smiles))
-            atom_id_to_support_list_with_counts[atom_id][k] = current_atom_id_to_count[atom_id]
-    
-    # binarise support list so that it only indicates presence/absence of fragments in training compounds
-    atom_id_to_support_list = {atom_id: [1 if b > 0 else 0 for b in support_list_with_counts] for (atom_id, support_list_with_counts) in atom_id_to_support_list_with_counts.items()}
-    
-    # create atom id list sorted by prevalence
-    atom_id_to_support_cardinality = {atom_id: sum(support_list) for (atom_id, support_list) in atom_id_to_support_list.items()}
-    atom_id_list_sorted = sorted(list(atom_id_set), key = lambda atom_id: atom_id_to_support_cardinality[atom_id], reverse = True)
-   
-    # create integer substructure identifier (= atom id) embedding function
-    def atom_id_one_hot_encoder(atom_id):
-        
-        return one_hot_vec(ecfp_settings["dimension"], atom_id_list_sorted.index(atom_id)) if atom_id in atom_id_list_sorted[0:ecfp_settings["dimension"]] else np.zeros(ecfp_settings["dimension"])
-
-    print("Number of unique substructures in molecular data set = ", len(atom_id_to_support_list.keys()))
-
-    return atom_id_one_hot_encoder
-
-"""
