@@ -7,8 +7,6 @@ import matplotlib.pyplot as plt
 
 
 
-
-
 def extract_info_from_filename(filename):
     
     """
