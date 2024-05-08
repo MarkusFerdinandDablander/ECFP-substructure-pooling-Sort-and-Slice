@@ -8,7 +8,6 @@ import glob
 
 
 
-
 def transform_probs_to_labels(y_pred_proba_pos, cutoff_value = 0.5):
     """
     Transforms an array of probabilities into a binary array of 0s and 1s.
@@ -266,7 +265,7 @@ def summarise_display_and_save_results_and_settings(scores_dict, settings_dict, 
     with open(filepath + "settings_dict_last_experiment.txt", 'w') as f:
         for key in settings_dict.keys():
             f.write(str(key) + " = " + str(settings_dict[key]) + "\n")
-            
+
 
 
 def delete_all_files_in_folder(filepath):
