@@ -252,10 +252,12 @@ def summarise_display_and_save_results_and_settings(scores_dict, settings_dict, 
     if display_results == True:
         display(scores_table)
     
-    if settings_dict["ecfp_settings"]["mol_to_invs_function"] == ecfp_invariants:
+    if "ecfp" in str(settings_dict["ecfp_settings"]["mol_to_invs_function"]):
         feature_info = str(settings_dict["ecfp_settings"]["dimension"]) + "ecfp" + str(2*settings_dict["ecfp_settings"]["radius"]) + settings_dict["ecfp_settings"]["pool_method"]
-    elif settings_dict["ecfp_settings"]["mol_to_invs_function"] == fcfp_invariants:
+    elif "fcfp" in str(settings_dict["ecfp_settings"]["mol_to_invs_function"]):
         feature_info = str(settings_dict["ecfp_settings"]["dimension"]) + "fcfp" + str(2*settings_dict["ecfp_settings"]["radius"]) + settings_dict["ecfp_settings"]["pool_method"]
+    else:
+        feature_info = str(settings_dict["ecfp_settings"]["dimension"]) + "unknown_atomic_invariants" + str(2*settings_dict["ecfp_settings"]["radius"]) + settings_dict["ecfp_settings"]["pool_method"]
     
     filename = settings_dict["dataset_name"] + "_" + settings_dict["split_type"] + "k" + str(settings_dict["k_splits"]) + "m" + str(settings_dict["m_reps"]) + "_" + feature_info + "_" + settings_dict["ml_model"]
     filepath = "results/" + settings_dict["dataset_name"] + "/" + settings_dict["split_type"] + "/"
