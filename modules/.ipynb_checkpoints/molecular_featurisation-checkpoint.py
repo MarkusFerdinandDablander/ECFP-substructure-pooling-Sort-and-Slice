@@ -105,7 +105,7 @@ def create_ecfp_atom_id_one_hot_encoder_sort_and_slice(x_smiles, ecfp_settings, 
         for atom_id in current_atom_id_to_count.keys():
             atom_id_to_support_list[atom_id][k] = 1 if current_atom_id_to_count[atom_id] > 0 else 0
             
-    print("Number of unique circular substructures with specified parameters in molecular data set = ", len(atom_id_to_support_list.keys()))
+    print("Number of unique circular substructures with specified parameters in molecular training data set = ", len(atom_id_to_support_list.keys()))
     
     # create list of atom ids sorted by prevalence in x_smiles (ties are either broken using the arbitrary ordering induced via sorted(list(...), ...) or the arbitrary ordering induced by the integer atom ids themselves)
     if break_ties_with == "sorted_list_command":
@@ -174,7 +174,7 @@ def create_ecfp_atom_id_one_hot_encoder_filtered(x_smiles, y, ecfp_settings, dis
             atom_id_to_support_list[atom_id][k] = 1 if current_atom_id_to_count[atom_id] > 0 else 0
             atom_id_to_info_list[atom_id] = atom_id_to_info_list.get(atom_id, []) + [(smiles, current_info[atom_id])]
     
-    print("Number of unique circular substructures with specified parameters in molecular data set = ", len(atom_id_set))
+    print("Number of unique circular substructures with specified parameters in molecular training data set = ", len(atom_id_set))
     
     # step 1: remove fragments with support of cardinality = 1, i.e. fragments which only occur in a single training compound
     atom_ids_single_occ = [atom_id for (atom_id, support_list) in atom_id_to_support_list.items() if sum(support_list) == 1]
@@ -272,7 +272,7 @@ def create_ecfp_atom_id_one_hot_encoder_mim(x_smiles, y, ecfp_settings, discreti
         for atom_id in set(current_atom_id_to_count):
             atom_id_to_support_list[atom_id][k] = 1 if current_atom_id_to_count[atom_id] > 0 else 0
             
-    print("Number of unique circular substructures with specified parameters in molecular data set = ", len(atom_id_set))
+    print("Number of unique circular substructures with specified parameters in molecular training data set = ", len(atom_id_set))
     
     # step 1: randomly drop fragments for which a fragment with same support exists
     support_tuple_to_atom_id_list = defaultdict(lambda: [])
