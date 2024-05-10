@@ -177,7 +177,7 @@ def create_ecfp_atom_id_one_hot_encoder_filtered(x_smiles, y, ecfp_settings, dis
     print("Number of unique circular substructures with specified parameters in molecular training data set = ", len(atom_id_set))
     
     # step 1: remove fragments with support of cardinality = 1, i.e. fragments which only occur in a single training compound
-    atom_ids_single_occ = [atom_id for (atom_id, support_list) in atom_id_to_support_list.items() if sum(support_list) == 1]
+    atom_ids_single_occ = [atom_id for atom_id in atom_id_set if sum(atom_id_to_support_list[atom_id]) == 1]
     random.shuffle(atom_ids_single_occ)
 
     while len(atom_ids_single_occ) > 0 and len(atom_id_set) > ecfp_settings["dimension"]:
