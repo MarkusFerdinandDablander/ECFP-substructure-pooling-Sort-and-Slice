@@ -103,7 +103,7 @@ def create_ecfp_atom_id_one_hot_encoder_sort_and_slice(x_smiles, ecfp_settings, 
         atom_id_set = atom_id_set.union(set(current_atom_id_to_count))
         
         for atom_id in current_atom_id_to_count.keys():
-            atom_id_to_support_list[atom_id][k] = 1 if current_atom_id_to_count[atom_id] > 0 else 0
+            atom_id_to_support_list[atom_id][k] = 1
             
     print("Number of unique circular substructures with specified parameters in molecular training data set = ", len(atom_id_to_support_list.keys()))
     
@@ -171,7 +171,7 @@ def create_ecfp_atom_id_one_hot_encoder_filtered(x_smiles, y, ecfp_settings, dis
         atom_id_set = atom_id_set.union(set(current_atom_id_to_count))
         
         for atom_id in current_atom_id_to_count.keys():
-            atom_id_to_support_list[atom_id][k] = 1 if current_atom_id_to_count[atom_id] > 0 else 0
+            atom_id_to_support_list[atom_id][k] = 1
             atom_id_to_info_list[atom_id] = atom_id_to_info_list.get(atom_id, []) + [(smiles, current_info[atom_id])]
     
     print("Number of unique circular substructures with specified parameters in molecular training data set = ", len(atom_id_set))
@@ -270,7 +270,7 @@ def create_ecfp_atom_id_one_hot_encoder_mim(x_smiles, y, ecfp_settings, discreti
         atom_id_set = atom_id_set.union(set(current_atom_id_to_count))
         
         for atom_id in set(current_atom_id_to_count):
-            atom_id_to_support_list[atom_id][k] = 1 if current_atom_id_to_count[atom_id] > 0 else 0
+            atom_id_to_support_list[atom_id][k] = 1
             
     print("Number of unique circular substructures with specified parameters in molecular training data set = ", len(atom_id_set))
     
