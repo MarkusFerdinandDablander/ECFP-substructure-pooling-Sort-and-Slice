@@ -47,9 +47,9 @@ def fcfp_invariants(mol):
 
 
 
-def one_hot_vec(dim, k):
+def standard_unit_vector(dim, k):
     """
-    Creates a one-hot vector that has 0s everywhere except in its k-th component.
+    Creates a vector that has 0s everywhere except in its k-th component.
     """
     
     vec = np.zeros(dim)
@@ -62,7 +62,6 @@ def one_hot_vec(dim, k):
 def ecfp_atom_ids_from_smiles(smiles, ecfp_settings):
     """
     A function that takes as input a SMILES string and a dictionary of ECFP settings and outputs a pair of dictionaries. The keys of each dictionary are given by the hashed integer ECFP substructure identifiers ( = the set of generated atom ids) in the input molecule. The first dictionary maps each atom id to its count (i.e. how often it appears in the input compound). If ecfp_settings["use_counts"] = False, then all atom ids are mapped to 1. The second dictionary named info_dict maps each atom id to a tuple containing the location(s) of the associated circular substructure in the input compound (specified via the center atom and the radius).
-    
     """
     
     mol = Chem.MolFromSmiles(smiles)
@@ -116,7 +115,7 @@ def create_ecfp_atom_id_one_hot_encoder_sort_and_slice(x_smiles, ecfp_settings, 
     # create integer substructure identifier (= atom id) embedding function
     def atom_id_one_hot_encoder(atom_id):
         
-        return one_hot_vec(ecfp_settings["dimension"], atom_id_list_sorted.index(atom_id)) if atom_id in atom_id_list_sorted[0: ecfp_settings["dimension"]] else np.zeros(ecfp_settings["dimension"])
+        return standard_unit_vector(ecfp_settings["dimension"], atom_id_list_sorted.index(atom_id)) if atom_id in atom_id_list_sorted[0: ecfp_settings["dimension"]] else np.zeros(ecfp_settings["dimension"])
     
     return atom_id_one_hot_encoder
 
@@ -230,7 +229,7 @@ def create_ecfp_atom_id_one_hot_encoder_filtered(x_smiles, y, ecfp_settings, dis
     # create integer substructure identifier (= atom id) embedding function
     def atom_id_one_hot_encoder(atom_id):
         
-        return one_hot_vec(ecfp_settings["dimension"], final_atom_id_list.index(atom_id)) if atom_id in final_atom_id_list else np.zeros(ecfp_settings["dimension"])
+        return standard_unit_vector(ecfp_settings["dimension"], final_atom_id_list.index(atom_id)) if atom_id in final_atom_id_list else np.zeros(ecfp_settings["dimension"])
     
     return atom_id_one_hot_encoder
 
@@ -301,7 +300,7 @@ def create_ecfp_atom_id_one_hot_encoder_mim(x_smiles, y, ecfp_settings, discreti
     # create integer substructure identifier (= atom id) embedding function
     def atom_id_one_hot_encoder(atom_id):
         
-        return one_hot_vec(ecfp_settings["dimension"], atom_id_list_sorted.index(atom_id)) if atom_id in atom_id_list_sorted[0: ecfp_settings["dimension"]] else np.zeros(ecfp_settings["dimension"])
+        return standard_unit_vector(ecfp_settings["dimension"], atom_id_list_sorted.index(atom_id)) if atom_id in atom_id_list_sorted[0: ecfp_settings["dimension"]] else np.zeros(ecfp_settings["dimension"])
     
     return atom_id_one_hot_encoder
 
@@ -342,13 +341,26 @@ def create_ecfp_featuriser(ecfp_settings,
         def featuriser(x_smiles):
             
             x_mol = [Chem.MolFromSmiles(smiles) for smiles in x_smiles]
+           
+            if ecfp_settings["use_counts"] != True:
+                
+                # generates hashed binary vectorial fingerprint indicating the presence/absence of substructures (substructure pooling via hash-based folding)
+                X_fp = np.array([Chem.rdMolDescriptors.GetMorganFingerprintAsBitVect(mol,
+                                                                                     radius = ecfp_settings["radius"],
+                                                                                     nBits = ecfp_settings["dimension"],
+                                                                                     invariants = ecfp_settings["mol_to_invs_function"](mol),
+                                                                                     useBondTypes = ecfp_settings["use_bond_invs"],
+                                                                                     useChirality = ecfp_settings["use_chirality"]) for mol in x_mol])
+            else:
+                
+                # generates integer vectorial fingerprints indicating substructure counts (substructure pooling via hash-based folding)
+                X_fp = np.array([Chem.rdMolDescriptors.GetHashedMorganFingerprint(mol,
+                                                                                  radius = ecfp_settings["radius"],
+                                                                                  nBits = ecfp_settings["dimension"],
+                                                                                  invariants = ecfp_settings["mol_to_invs_function"](mol),
+                                                                                  useBondTypes = ecfp_settings["use_bond_invs"],
+                                                                                  useChirality = ecfp_settings["use_chirality"]).ToList() for mol in x_mol])
             
-            X_fp = np.array([Chem.rdMolDescriptors.GetMorganFingerprintAsBitVect(mol,
-                                                                                 radius = ecfp_settings["radius"],
-                                                                                 nBits = ecfp_settings["dimension"],
-                                                                                 invariants = ecfp_settings["mol_to_invs_function"](mol),
-                                                                                 useBondTypes = ecfp_settings["use_bond_invs"],
-                                                                                 useChirality = ecfp_settings["use_chirality"]) for mol in x_mol])
             return X_fp
         
         return featuriser

@@ -227,11 +227,6 @@ def visualise_box_plots(dataset_name, metric, y_unit = "", show_x_ticks = True, 
             # create boxplot
             data = [boxplot_data_dict[(pool, ml, split_type)] for pool in ["hashed", "filtered", "mim", "sort_and_slice"]]
             
-            import numpy as np
-            print(np.mean(np.array(data), axis = 1))
-            print(np.std(np.array(data), axis = 1), "\n")
-            
-            
             colours = ["silver", "violet", "lightsalmon", "forestgreen"]*4
             sns.boxplot(data = data, orient = "v", fliersize = 4, palette = colours, width = 0.7, linewidth = 2, ax = ax)
 
