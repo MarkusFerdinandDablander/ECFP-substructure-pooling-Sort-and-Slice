@@ -1,4 +1,4 @@
-name: substructure_pooling
+name: ecfp_substructure_pooling
 channels:
   - conda-forge
   - defaults
