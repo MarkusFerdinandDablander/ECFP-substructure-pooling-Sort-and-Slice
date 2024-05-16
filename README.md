@@ -4,12 +4,19 @@ Code repository for the paper Sort & Slice: A Simple and Superior Alternative to
 
 https://arxiv.org/abs/2403.17954
 
-This repository contains (i) a simple and self-contained function to generate vectorial ECFPs via Sort & Slice from RDKit mol objects, (ii) the code and data sets to reproduce the computational results from the paper, and (iii) the the original exact numerical results from the experiments conducted in the paper.
+This repository contains:
+
+* A simple, self-contained and fast [function](sort_and_slice_ecfp_featuriser.py) to transform RDKit mol objects into vectorial extended-connectivity fingerprints (ECFPs) pooled via Sort & Slice.
+* The code base and data sets to fully reproduce the computational results from the paper.
+* Original numerical results from the experiments conducted in the paper.
 
 
-## Easily Generating Vectorial Sort & Slice ECFPs
 
-The file [sort_and_slice_ecfp_featuriser.py](sort_and_slice_ecfp_featuriser.py) contains a self-contained, computationally efficient and easy-to-use plug-in function to transform RDKit mol objects into vectorial ECFPs pooled via a trained Sort & Slice operator (instead of classical hash-based folding). This function only relies on RDKit and numpy and generates a featuriser that can readily be employed for molecular machine learning and other ECFP-based applications. If you are interested in improving the predictive performance of ECFPs in your own machine learning application by using Sort & Slice rather than hash-based folding for ECFP vectorisation, this function should be all you need.
+
+  
+## Easily Generating Vectorial ECFPs via Sort & Slice from RDKit mol Objects
+
+The file [sort_and_slice_ecfp_featuriser.py](sort_and_slice_ecfp_featuriser.py) contains a self-contained, computationally efficient and easy-to-use function to transform RDKit mol objects into vectorial ECFPs pooled via a trained Sort & Slice operator (rather than via classical hash-based folding). It only relies on RDKit and NumPy and can be used to create a Sort & Slice featuriser that can readily be employed for molecular machine learning and other ECFP-based applications. If you are interested in improving the predictive performance of ECFPs in your own machine learning application by using Sort & Slice rather than hash-based folding for ECFP vectorisation, this function should be all you need.
 
 EXAMPLE:
     
