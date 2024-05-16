@@ -13,7 +13,7 @@ def create_sort_and_slice_ecfp_featuriser(mols_train,
                                           break_ties_with = lambda sub_id: sub_id, 
                                           print_train_set_info = True):
     """
-    Creates a function "ecfp_featuriser" that maps RDKit mol objects to vectorial ECFP fingerprints pooled via a trained Sort & Slice operator (instead of classical hash-based folding).
+    Creates a function "ecfp_featuriser" that maps RDKit mol objects to vectorial extended-connectivity fingerprints (ECFPs) pooled via a trained Sort & Slice operator (instead of classical hash-based folding).
     See also "Sort & Slice: A Simple and Superior Alternative to Hash-Based Folding for Extended-Connectivity Fingerprints" by Dablander, Hanser, Lambiotte and Morris (2024): https://arxiv.org/abs/2403.17954
     
     
@@ -45,7 +45,7 @@ def create_sort_and_slice_ecfp_featuriser(mols_train,
     
     OUTPUT:
     
-    - ecfp_featuriser (function)   ...    A function that maps RDKit mol objects to vectorial ECFP fingerprints (1-dimensional NumPy arrays of length vec_dimension) via a Sort & Slice substructure pooling operator trained on mols_train.
+    - ecfp_featuriser (function)   ...    A function that maps RDKit mol objects to vectorial ECFPs (1-dimensional NumPy arrays of length vec_dimension) via a Sort & Slice substructure pooling operator trained on mols_train.
     
     
     EXAMPLE:
@@ -63,7 +63,7 @@ def create_sort_and_slice_ecfp_featuriser(mols_train,
                                                                print_train_set_info = True)
                                                                
     Note that the ECFP settings (max_radius, pharm_atom_invs, bond_invs, chirality, sub_counts, vec_dimension, break_ties_with) as well as chemical information from mols_train are all by construction implicitly transferred to "ecfp_featuriser".
-    Now let mol be an RDKit mol object. Then ecfp_featuriser(mol) is a 1-dimensional NumPy array of length vec_dimension representing the vectorial Sort & Slice ECFP fingerprint for mol.
+    Now let mol be an RDKit mol object. Then ecfp_featuriser(mol) is a 1-dimensional NumPy array of length vec_dimension representing the vectorial Sort & Slice ECFPs for mol.
     The function ecfp_featuriser(mol) works by (i) first generating the (multi)set of integer ECFP-substructure identifiers for mol and then (ii) vectorising it via a Sort & Slice operator trained on mols_train (rather than via classical hash-based folding).
     """
     
@@ -99,7 +99,7 @@ def create_sort_and_slice_ecfp_featuriser(mols_train,
         
         return standard_unit_vector(vec_dimension, sub_ids_sorted_list.index(sub_id)) if sub_id in sub_ids_sorted_list[0: vec_dimension] else np.zeros(vec_dimension)
     
-    # create a function ecfp_featuriser that maps RDKit mol objects to vectorial ECFP fingerprints via a Sort & Slice substructure pooling operator trained on mols_train
+    # create a function ecfp_featuriser that maps RDKit mol objects to vectorial ECFPs via a Sort & Slice substructure pooling operator trained on mols_train
     def ecfp_featuriser(mol):
 
         # create list of integer substructure identifiers contained in input mol object (multiplied by how often they are structurally contained in mol if sub_counts = True)
