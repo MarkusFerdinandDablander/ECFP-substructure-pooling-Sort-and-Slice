@@ -34,7 +34,9 @@ to construct a molecular featurisation function with desired ECFP hyperparameter
                                                                break_ties_with = lambda sub_id: sub_id, 
                                                                print_train_set_info = True)
                                                                
-Then ecfp_featuriser(mol) is a 1-dimensional numpy array of length vec_dimension representing the vectorial ECFP for mol pooled via Sort & Slice. The function ecfp_featuriser works by (i) first generating the (multi)set of integer ECFP-substructure identifiers for mol and then (ii) vectorising it via a Sort & Slice operator trained on [mol_1, mol_2, ...] (rather than vectorising it via classical hash-based folding).
+Then ecfp_featuriser(mol) is a 1-dimensional numpy array of length vec_dimension representing the vectorial ECFP for mol pooled via Sort & Slice. The function ecfp_featuriser works by 
+1. first generating the (multi)set of integer ECFP-substructure identifiers for mol and then
+2. vectorising it via a Sort & Slice operator trained on [mol_1, mol_2, ...] (rather than vectorising it via classical hash-based folding).
 
 
 
