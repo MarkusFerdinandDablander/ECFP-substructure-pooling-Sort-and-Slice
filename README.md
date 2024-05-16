@@ -34,27 +34,15 @@ to construct a molecular featurisation function with desired ECFP hyperparameter
                                                                break_ties_with = lambda sub_id: sub_id, 
                                                                print_train_set_info = True)
                                                                
-Then ecfp_featuriser(mol) is a 1-dimensional numpy array of length vec_dimension representing the vectorial ECFP for mol pooled via Sort & Slice. The function ecfp_featuriser works by 
+Then ecfp_featuriser(mol) is a 1-dimensional numpy array of length vec_dimension representing the vectorial ECFP for mol pooled via Sort & Slice. The function ecfp_featuriser can be thought of as
 1. first generating the (multi)set of integer ECFP-substructure identifiers for mol and then
 2. vectorising it via a Sort & Slice operator trained on [mol_1, mol_2, ...] (rather than vectorising it via classical hash-based folding).
 
 
 
+## Reproducing Computational Experiments
 
-
-
-
-
-## Data Sets
-
-The data-folder contains three clean chemical data sets of small-molecule inhibitors of dopamine receptor D2, factor Xa, or SARS-CoV-2 main protease respectively. Each data set is represented by two files: molecule_data_clean.csv and MMP_data_clean.csv. The first file contains SMILES strings with associated activity values and the second file contains all matched molecular pairs (MMPs) identified within the first file.
-
-## Reproducing the Experiments
-
-The experiments in the paper can be reproduced by running the code in the Jupyter notebook QSAR_activity_cliff_experiments.ipynb. First, the QSAR-, AC-, and PD-prediction tasks for the chosen data set are formally constructed in a data-preparation section. Then, an appropriate data split is conducted, both at the level of individual molecules and MMPs. Finally, a molecular representation (PDV, ECFP, or GIN) and a regression technique (RF, kNN, MLP) are chosen and the resulting model is trained and evaluated for QSAR-prediction, AC-classification and PD-classification. The computational environment in which the original results were conducted can be found in environment.yml.
-
+The computational results reported in the paper can be reproduced and visualised by running the Jupyter notebook [substructure_pooling_experiments.ipynb](substructure_pooling_experiments.ipynb) which uses the code base in [modules](modules). The [data](data) folder contains the five (cleaned) chemical data sets for the diverse prediction tasks investigated in the paper: lipophilicity, aqueous solubility, SARS-CoV-2 main protease inhibition, mutagenicity, and estrogen receptor alpha antagonism. Each data set is given as a set of labelled SMILES strings. The computational environment in which the original results were conducted can be found in [environment.yml](environment.yml). The original numerical results from the paper are saved in [results](results).
+ 
 ![Substructure Pooling Overview](/figures/sub_pool_methods_overview.png)
 
-## Visually Investigating the Results:
-
-The experimental results can be visually explored using the visualise_results-function at the end of QSAR_activity_cliff_experiments.ipynb. This function produces scatterplots such as the one in the graphical abstract above. The original numerical results from the paper are saved in the resuls-folder; thus the original plots from the paper (and more) can be generated with visualise_results.
