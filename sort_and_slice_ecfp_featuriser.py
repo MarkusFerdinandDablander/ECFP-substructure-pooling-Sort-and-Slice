@@ -45,7 +45,7 @@ def create_sort_and_slice_ecfp_featuriser(mols_train,
     
     OUTPUT:
     
-    - ecfp_featuriser (function)   ...    A function that maps RDKit mol objects to vectorial ECFP fingerprints (1-dimensional numpy arrays of length vec_dimension) via a Sort & Slice substructure pooling operator trained on mols_train.
+    - ecfp_featuriser (function)   ...    A function that maps RDKit mol objects to vectorial ECFP fingerprints (1-dimensional NumPy arrays of length vec_dimension) via a Sort & Slice substructure pooling operator trained on mols_train.
     
     
     EXAMPLE:
@@ -63,7 +63,7 @@ def create_sort_and_slice_ecfp_featuriser(mols_train,
                                                                print_train_set_info = True)
                                                                
     Note that the ECFP settings (max_radius, pharm_atom_invs, bond_invs, chirality, sub_counts, vec_dimension, break_ties_with) as well as chemical information from mols_train are all by construction implicitly transferred to "ecfp_featuriser".
-    Now let mol be an RDKit mol object. Then ecfp_featuriser(mol) is a 1-dimensional numpy array of length vec_dimension representing the vectorial Sort & Slice ECFP fingerprint for mol.
+    Now let mol be an RDKit mol object. Then ecfp_featuriser(mol) is a 1-dimensional NumPy array of length vec_dimension representing the vectorial Sort & Slice ECFP fingerprint for mol.
     The function ecfp_featuriser(mol) works by (i) first generating the (multi)set of integer ECFP-substructure identifiers for mol and then (ii) vectorising it via a Sort & Slice operator trained on mols_train (rather than via classical hash-based folding).
     """
     
@@ -86,7 +86,7 @@ def create_sort_and_slice_ecfp_featuriser(mols_train,
     # create list of integer substructure identifiers sorted by prevalence in mols_train
     sub_ids_sorted_list = sorted(sub_ids_to_prevs_dict, key = lambda sub_id: (sub_ids_to_prevs_dict[sub_id], break_ties_with(sub_id)), reverse = True)
     
-    # create auxiliary function that generates standard unit vectors in numpy
+    # create auxiliary function that generates standard unit vectors in NumPy
     def standard_unit_vector(dim, k):
         
         vec = np.zeros(dim, dtype = int)
