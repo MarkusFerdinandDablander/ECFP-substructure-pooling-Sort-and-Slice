@@ -18,7 +18,7 @@ The function in [sort_and_slice_ecfp_featuriser.py](sort_and_slice_ecfp_featuris
 
 EXAMPLE:
     
-First construct a molecular featurisation function with desired settings, for instance via
+First use a training set of RDKit mol objects [mol_1, mol_2, ...] to construct a molecular featurisation function with desired ECFP hyperparameter settings, for example via
     
     ecfp_featuriser = construct_sort_and_slice_ecfp_featuriser(mols_train = [mol_1, mol_2, ...], 
                                                                max_radius = 2, 
@@ -30,9 +30,7 @@ First construct a molecular featurisation function with desired settings, for in
                                                                break_ties_with = lambda sub_id: sub_id, 
                                                                print_train_set_info = True)
                                                                
-    Note that the ECFP settings (max_radius, pharm_atom_invs, bond_invs, chirality, sub_counts, vec_dimension, break_ties_with) as well as chemical information from mols_train are all by construction implicitly transferred to "ecfp_featuriser".
-    Now let mol be an RDKit mol object. Then ecfp_featuriser(mol) is a 1-dimensional numpy array of length vec_dimension representing the vectorial Sort & Slice ECFP fingerprint for mol.
-    The function ecfp_featuriser(mol) works by (i) first generating the (multi)set of integer ECFP-substructure identifiers for mol and then (ii) vectorising it via a Sort & Slice operator trained on mols_train (rather than via classical hash-based folding).
+Then ecfp_featuriser(mol) is a 1-dimensional numpy array of length vec_dimension representing the vectorial ECFP for mol pooled via Sort & Slice. The function ecfp_featuriser(mol) works by (i) first generating the (multi)set of integer ECFP-substructure identifiers for mol and then (ii) vectorising it via a Sort & Slice operator trained on [mol_1, mol_2, ...] (rather than vectorising it via classical hash-based folding).
 
 
 
