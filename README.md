@@ -7,8 +7,8 @@ https://arxiv.org/abs/2403.17954
 This repository contains:
 
 * A simple, self-contained and fast [function](sort_and_slice_ecfp_featuriser.py) to transform RDKit mol objects into vectorial extended-connectivity fingerprints (ECFPs) pooled via Sort & Slice.
-* The code base and data sets to fully reproduce the computational results from the paper.
-* Original numerical results from the experiments conducted in the paper.
+* The [code base](modules) and [data sets](data) to fully reproduce the computational results from the paper.
+* [Original numerical results](results) from the experiments conducted in the paper.
 
 
 
@@ -40,9 +40,9 @@ Then ecfp_featuriser(mol) is a 1-dimensional numpy array of length vec_dimension
 
 
 
-## Reproducing Computational Experiments
+## Computational Experiments
 
-The computational results reported in the paper can be reproduced and visualised by running the Jupyter notebook [substructure_pooling_experiments.ipynb](substructure_pooling_experiments.ipynb) which uses the code base in [modules](modules). The [data](data) folder contains the five (cleaned) chemical data sets for the diverse prediction tasks investigated in the paper: lipophilicity, aqueous solubility, SARS-CoV-2 main protease inhibition, mutagenicity, and estrogen receptor alpha antagonism. Each data set is given as a set of labelled SMILES strings. The computational environment in which the original results were conducted can be found in [environment.yml](environment.yml). The original numerical results from the paper are saved in [results](results).
+The computational results reported in the paper can be reproduced and visualised by running the Jupyter notebook [substructure_pooling_experiments.ipynb](substructure_pooling_experiments.ipynb) which uses the code base in [modules](modules). The [data folder](data) contains the five (cleaned) chemical data sets for the diverse prediction tasks investigated in the paper: lipophilicity, aqueous solubility, SARS-CoV-2 main protease inhibition, mutagenicity, and estrogen receptor alpha antagonism. Each data set is given as a set of labelled SMILES strings. The computational environment in which the original results were conducted can be found in [environment.yml](environment.yml). The original numerical results from the paper are saved in [results](results).
  
 ![Substructure Pooling Overview](/figures/sub_pool_methods_overview.png)
 
