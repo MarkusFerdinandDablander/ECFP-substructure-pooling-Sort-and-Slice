@@ -18,7 +18,11 @@ The function in [sort_and_slice_ecfp_featuriser.py](sort_and_slice_ecfp_featuris
 
 EXAMPLE:
     
-First use a training set of RDKit mol objects [mol_1, mol_2, ...] to construct a molecular featurisation function with desired ECFP hyperparameter settings, for example via
+First use a training set of RDKit mol objects 
+
+    [mol_1, mol_2, ...] 
+    
+to construct a molecular featurisation function with desired ECFP hyperparameter settings, for example via
     
     ecfp_featuriser = construct_sort_and_slice_ecfp_featuriser(mols_train = [mol_1, mol_2, ...], 
                                                                max_radius = 2, 
