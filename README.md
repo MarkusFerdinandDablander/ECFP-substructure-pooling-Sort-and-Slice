@@ -4,7 +4,22 @@ Code repository for the paper Sort & Slice: A Simple and Superior Alternative to
 
 https://arxiv.org/abs/2403.17954
 
-This repository also contains clean molecular data for all five analysed data sets () as well as the original numerical results from the experiments conducted in the paper.
+
+
+## Easily Generating Vectorial ECFPs via Sort & Slice
+
+The file [sort_and_slice_ecfp_featuriser.py](sort_and_slice_ecfp_featuriser.py) contains a self-contained, computationally efficient and easy-to-use function to transform RDKit into vectorial ECFP fingerprints pooled via a trained Sort & Slice operator (instead of classical hash-based folding).
+
+If you are interested in improving the predictive performance of ECFPs in your own machine learning application, this function should be all you need.
+
+
+
+
+
+
+This repositoris
+
+This repository also contains clean molecular data for all five analysed data sets (lipophilicity) as well as the original numerical results from the experiments conducted in the paper.
 
 ![Substructure Pooling Overview](/figures/sub_pool_methods_overview.png)
 
