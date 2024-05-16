@@ -6,7 +6,7 @@ https://arxiv.org/abs/2403.17954
 
 This repository also contains clean molecular data for all five analysed data sets () as well as the original numerical results from the experiments conducted in the paper.
 
-![Substructure Pooling Overview](/figures/sub_pool_methods_overview.pdf)
+![Substructure Pooling Overview](/figures/sub_pool_methods_overview.png)
 
 ## Data Sets
 
