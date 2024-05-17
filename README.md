@@ -12,7 +12,10 @@ This repository contains:
 
 ## Easily Generating Vectorial ECFPs via Sort & Slice from RDKit Mol Objects
 
-The function in [sort_and_slice_ecfp_featuriser.py](sort_and_slice_ecfp_featuriser.py) constitutes a computationally efficient, easy-to-use and self-contained method to create a featuriser that can transform RDKit mol objects into vectorial ECFPs via Sort & Slice substructure pooling (rather than via classical hash-based folding). It only relies on RDKit and NumPy and can be readily employed for molecular feature extraction and other ECFP-based applications. This function should be all you need in case you want to use vectorial Sort & Slice ECFPs in your own project. An extensive series of strict [computational experiments](https://arxiv.org/abs/2403.17954) indicates that ECFPs vectorised via Sort & Slice regularly lead to higher (and sometimes substantially higher) predictive performance than ECFPs vectorised via classical hash-based folding across a wide variety of molecular property prediction scenarios.
+* The function in [sort_and_slice_ecfp_featuriser.py](sort_and_slice_ecfp_featuriser.py) constitutes a computationally efficient, easy-to-use and self-contained method to create a featuriser that can transform RDKit mol objects into vectorial ECFPs via Sort & Slice substructure pooling (rather than via classical hash-based folding).
+* It only relies on RDKit and NumPy and can be readily employed for molecular feature extraction and other ECFP-based applications.
+* This function should be all you need in case you want to use vectorial Sort & Slice ECFPs in your own project.
+* An extensive series of strict [computational experiments](https://arxiv.org/abs/2403.17954) indicates that ECFPs vectorised via Sort & Slice regularly lead to higher (and sometimes substantially higher) predictive performance than ECFPs vectorised via classical hash-based folding across a wide variety of molecular property prediction scenarios.
 
 
 EXAMPLE:
@@ -44,5 +47,8 @@ More specifically, the function ecfp_featuriser can be thought of as
 
 ![Substructure Pooling Overview](/figures/sub_pool_methods_overview.png)
 
-The computational experiments from the paper can be reproduced and visualised using the Jupyter notebook [substructure_pooling_experiments.ipynb](substructure_pooling_experiments.ipynb) which provides an easy way to interface with the code base in [modules](modules). The [data folder](data) contains the five (cleaned) chemical data sets for the diverse set of prediction tasks investigated in the paper: lipophilicity, aqueous solubility, SARS-CoV-2 main protease inhibition, mutagenicity, and estrogen receptor alpha antagonism. Each data set is given as a set of labelled SMILES strings. The computational environment in which the original results were conducted is given in [environment.yml](environment.yml). The original numerical results from the paper can be found both in [results](results) and in [results_original](results_original). If new computational results are generated and saved using the Jupyter notebook, then by default they overwrite the content of the [results-folder](results).
+* The computational experiments from the paper can be reproduced and visualised using the Jupyter notebook [substructure_pooling_experiments.ipynb](substructure_pooling_experiments.ipynb) which provides an easy way to interface with the code base in [modules](modules).
+* The [data folder](data) contains the five (cleaned) chemical data sets for the diverse set of prediction tasks investigated in the paper: lipophilicity, aqueous solubility, SARS-CoV-2 main protease inhibition, mutagenicity, and estrogen receptor alpha antagonism. Each data set is given as a set of labelled SMILES strings.
+* The computational environment in which the original results were conducted is given in [environment.yml](environment.yml).
+* The original numerical results from the paper can be found both in [results](results) and in [results_original](results_original). If new computational results are generated and saved using the Jupyter notebook, then by default they overwrite the content of the [results-folder](results).
 
