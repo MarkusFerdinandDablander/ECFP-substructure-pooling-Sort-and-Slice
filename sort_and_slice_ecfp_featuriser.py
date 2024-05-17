@@ -54,17 +54,17 @@ def create_sort_and_slice_ecfp_featuriser(mols_train,
     
     First select a training set of RDKit mol objects 
 
-    mols_train = [mol_1, mol_2, ...] 
+        mols_train = [mol_1, mol_2, ...]
     
     that should be used to calibrate the Sort & Slice operator. This training set can then be employed along with a set of desired ECFP hyperparameter settings to construct a molecular featurisation function:
     
-    ecfp_featuriser = construct_sort_and_slice_ecfp_featuriser(mols_train = mols_train, 
-                                                               max_radius = 2, 
-                                                               pharm_atom_invs = False, 
-                                                               bond_invs = True, 
-                                                               chirality = False, 
-                                                               sub_counts = True, 
-                                                               vec_dimension = 1024)
+        ecfp_featuriser = construct_sort_and_slice_ecfp_featuriser(mols_train = mols_train, 
+                                                                   max_radius = 2, 
+                                                                   pharm_atom_invs = False, 
+                                                                   bond_invs = True, 
+                                                                   chirality = False, 
+                                                                   sub_counts = True, 
+                                                                   vec_dimension = 1024)
                                                                
     Then ecfp_featuriser(mol) is a 1-dimensional numpy array of length vec_dimension representing the vectorial ECFP for mol pooled via a Sort & Slice operator calibrated on mols_train. 
     
@@ -75,7 +75,7 @@ def create_sort_and_slice_ecfp_featuriser(mols_train,
     
     To now turn any list of RDKit mol objects mols_list into a feature matrix X whose rows correspond to vectorial Sort & Slice ECFPs one can simply run
     
-    X = np.array([ecfp_featuriser(mol) for mol in mols_list])
+        X = np.array([ecfp_featuriser(mol) for mol in mols_list])
     
     """
     
