@@ -57,12 +57,12 @@ def create_sort_and_slice_ecfp_featuriser(mols_train,
     that should be used to calibrate the Sort & Slice operator. This training set can then be employed along with a set of desired ECFP hyperparameter settings to construct a molecular featurisation function:
     
     ecfp_featuriser = construct_sort_and_slice_ecfp_featuriser(mols_train = mols_train, 
-                                                                   max_radius = 2, 
-                                                                   pharm_atom_invs = False, 
-                                                                   bond_invs = True, 
-                                                                   chirality = False, 
-                                                                   sub_counts = True, 
-                                                                   vec_dimension = 1024)
+                                                               max_radius = 2, 
+                                                               pharm_atom_invs = False, 
+                                                               bond_invs = True, 
+                                                               chirality = False, 
+                                                               sub_counts = True, 
+                                                               vec_dimension = 1024)
                                                                
     Then ecfp_featuriser(mol) is a 1-dimensional numpy array of length vec_dimension representing the vectorial ECFP for mol pooled via a Sort & Slice operator calibrated on mols_train. 
     
