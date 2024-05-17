@@ -15,7 +15,7 @@ This repository contains:
 * The function in [sort_and_slice_ecfp_featuriser.py](sort_and_slice_ecfp_featuriser.py) constitutes a computationally efficient, easy-to-use and self-contained method to create a featuriser that can transform RDKit mol objects into vectorial ECFPs based on substructure pooling via Sort & Slice (rather than via classical hash-based folding).
 * It only relies on RDKit and NumPy and can be readily employed for molecular feature extraction and other ECFP-based applications.
 * This function should be all you need in case you want to employ vectorial Sort & Slice ECFPs.
-* An extensive series of [strict computational experiments](https://arxiv.org/abs/2403.17954) indicates that ECFPs vectorised via Sort & Slice regularly lead to higher (and sometimes substantially higher) predictive performance than ECFPs vectorised via classical hash-based folding across a wide variety of molecular property prediction scenarios.
+* An extensive series of [strict computational experiments](https://arxiv.org/abs/2403.17954) indicates that ECFPs pooled via Sort & Slice regularly lead to higher (and sometimes substantially higher) predictive performance than ECFPs pooled via classical hash-based folding across a wide variety of molecular property prediction scenarios.
 
 
 EXAMPLE:
