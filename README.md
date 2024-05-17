@@ -2,7 +2,7 @@
 
 Code repository for the paper [Sort & Slice: A Simple and Superior Alternative to Hash-Based Folding for Extended-Connectivity Fingerprints](https://arxiv.org/abs/2403.17954).
 
-Contains:
+This repository contains:
 
 * A simple, self-contained and fast [function](sort_and_slice_ecfp_featuriser.py) to transform RDKit mol objects into vectorial extended-connectivity fingerprints (ECFPs) via Sort & Slice.
 * The [code base](modules) and [data sets](data) to fully reproduce the computational results from the paper.
