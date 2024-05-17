@@ -17,6 +17,7 @@ def create_sort_and_slice_ecfp_featuriser(mols_train,
     See also "Sort & Slice: A Simple and Superior Alternative to Hash-Based Folding for Extended-Connectivity Fingerprints" by Dablander, Hanser, Lambiotte and Morris (2024): https://arxiv.org/abs/2403.17954
     
     
+    
     INPUTS:
     
     - mols_train (list)            ...  A list of RDKit mol objects [mol_1, mol_2, ...] that are used as the training set to calibrate the Sort & Slice substructure pooling operator.
@@ -47,6 +48,7 @@ def create_sort_and_slice_ecfp_featuriser(mols_train,
     
     - ecfp_featuriser (function)   ...    A function that maps RDKit mol objects to vectorial ECFPs (1-dimensional NumPy arrays of length vec_dimension) via a Sort & Slice substructure pooling operator trained on mols_train.
     
+     
      
     EXAMPLE:
     
