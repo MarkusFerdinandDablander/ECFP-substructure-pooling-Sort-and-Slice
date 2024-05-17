@@ -41,10 +41,13 @@ More specifically, the function ecfp_featuriser can be thought of as
 1. first generating the (multi)set of integer ECFP-substructure identifiers for mol based on the ECFP hyperparameters (max_radius, pharm_atom_invs, bond_invs, chirality, sub_counts) and then
 2. vectorising this (multi)set via a Sort & Slice operator trained on [mol_1, mol_2, ...] with output dimension vec_dimension (rather than vectorising it via classical hash-based folding).
 
+To turn a list of RDKit mol objects mols_list into a feature matrix X whose rows correspond to Sort & Slice ECFPs one can simply run
+    
+    X = np.array([ecfp_featuriser(mol) for mol in mols_list])
+
 
 
 ## Computational Experiments
-
 ![Substructure Pooling Overview](/figures/sub_pool_methods_overview.png)
 
 * The computational experiments from the paper can be reproduced and visualised using the Jupyter notebook [substructure_pooling_experiments.ipynb](substructure_pooling_experiments.ipynb) which provides an easy way to interface with the code base in [modules](modules).
