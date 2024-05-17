@@ -51,7 +51,7 @@ To now turn any list of RDKit mol objects mols_list into a feature matrix X whos
 ![Substructure Pooling Overview](/figures/sub_pool_methods_overview.png)
 
 * The computational experiments from the paper can be reproduced and visualised using the Jupyter notebook [substructure_pooling_experiments.ipynb](substructure_pooling_experiments.ipynb) which provides an easy way to interface with the code base in [modules](modules).
-* The [data folder](data) contains the five (cleaned) chemical data sets for the diverse set of prediction tasks investigated in the paper: lipophilicity, aqueous solubility, SARS-CoV-2 main protease inhibition, mutagenicity, and estrogen receptor alpha antagonism. Each data set is given as a set of labelled SMILES strings.
+* The [data](data) folder contains the five (cleaned) chemical data sets for the diverse set of prediction tasks investigated in the paper: lipophilicity, aqueous solubility, SARS-CoV-2 main protease inhibition, mutagenicity, and estrogen receptor alpha antagonism. Each data set is given as a set of labelled SMILES strings.
 * The computational environment in which the original results were conducted is given in [environment.yml](environment.yml).
 * The original numerical results from the paper can be found in [results](results) and are additionally backed up in [results_original](results_original). If new computational results are generated and saved using the Jupyter notebook, then by default they only overwrite the content of [results](results).
 
