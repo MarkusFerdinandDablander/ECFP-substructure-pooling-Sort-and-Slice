@@ -1,6 +1,6 @@
 # Sort & Slice: A Simple and Superior Alternative to Hash-Based Folding for Extended-Connectivity Fingerprints
 
-Code repository for the paper [Sort & Slice: A Simple and Superior Alternative to Hash-Based Folding for Extended-Connectivity Fingerprints](https://arxiv.org/abs/2403.17954): 
+Code repository for the paper [Sort & Slice: A Simple and Superior Alternative to Hash-Based Folding for Extended-Connectivity Fingerprints](https://arxiv.org/abs/2403.17954).
 
 This repository contains:
 
