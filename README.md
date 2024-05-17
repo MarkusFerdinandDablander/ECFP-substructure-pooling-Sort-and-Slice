@@ -22,11 +22,11 @@ EXAMPLE:
     
 First select a training set of RDKit mol objects 
 
-    [mol_1, mol_2, ...] 
+    mols_train = [mol_1, mol_2, ...] 
     
 that should be used to calibrate the Sort & Slice operator. This training set can then be employed along with a set of desired ECFP hyperparameter settings to construct a molecular featurisation function:
     
-    ecfp_featuriser = construct_sort_and_slice_ecfp_featuriser(mols_train = [mol_1, mol_2, ...], 
+    ecfp_featuriser = construct_sort_and_slice_ecfp_featuriser(mols_train = mols_train, 
                                                                max_radius = 2, 
                                                                pharm_atom_invs = False, 
                                                                bond_invs = True, 
@@ -34,14 +34,14 @@ that should be used to calibrate the Sort & Slice operator. This training set ca
                                                                sub_counts = True, 
                                                                vec_dimension = 1024)
                                                                
-Then ecfp_featuriser(mol) is a 1-dimensional numpy array of length vec_dimension representing the vectorial ECFP for mol pooled via a Sort & Slice operator calibrated on the training set [mol_1, mol_2, ...]. 
+Then ecfp_featuriser(mol) is a 1-dimensional numpy array of length vec_dimension representing the vectorial ECFP for mol pooled via a Sort & Slice operator calibrated on mols_train. 
 
 More specifically, the function ecfp_featuriser can be thought of as
 
 1. first generating the (multi)set of integer ECFP-substructure identifiers for mol based on the ECFP hyperparameters (max_radius, pharm_atom_invs, bond_invs, chirality, sub_counts) and then
-2. vectorising this (multi)set via a Sort & Slice operator trained on [mol_1, mol_2, ...] with output dimension vec_dimension (rather than vectorising it via classical hash-based folding).
+2. vectorising this (multi)set via a Sort & Slice operator calibrated on mols_train with output dimension vec_dimension (rather than vectorising it via classical hash-based folding).
 
-To turn a list of RDKit mol objects mols_list into a feature matrix X whose rows correspond to Sort & Slice ECFPs one can simply run
+To now turn any list of RDKit mol objects mols_list into a feature matrix X whose rows correspond to vectorial Sort & Slice ECFPs one can simply run
     
     X = np.array([ecfp_featuriser(mol) for mol in mols_list])
 
