@@ -46,7 +46,7 @@ def create_sort_and_slice_ecfp_featuriser(mols_train,
     
     OUTPUT:
     
-    - ecfp_featuriser (function)   ...    A function that maps RDKit mol objects to vectorial ECFPs (1-dimensional NumPy arrays of length vec_dimension) via a Sort & Slice substructure pooling operator trained on mols_train.
+    - ecfp_featuriser (function)   ...  A function that maps RDKit mol objects to vectorial ECFPs (1-dimensional NumPy arrays of length vec_dimension) via a Sort & Slice substructure pooling operator trained on mols_train.
     
      
      
