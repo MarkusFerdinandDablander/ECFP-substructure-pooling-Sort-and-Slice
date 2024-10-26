@@ -1,4 +1,4 @@
-# Sort & Slice: A Simple and Superior Alternative to Hash-Based Folding for Extended-Connectivity Fingerprints
+# Sort & Slice: A Simple and Superior Alternative to Hash-Based Folding for Extended-Connectivity Fingerprints (ECFPs)
 
 Code repository for the paper [Sort & Slice: A Simple and Superior Alternative to Hash-Based Folding for Extended-Connectivity Fingerprints](https://arxiv.org/abs/2403.17954).
 
